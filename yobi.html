@@ -1,0 +1,25 @@
+<html> 
+  <title>Spelling Jungle - Level Viewer</title>
+  <head>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="yobi.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="input-label">Load BSTCDRES.DLL:</div>
+      <input type="file" id="yobiDll" accept=".dll"/>
+    </div>
+    <div class="container">
+      <button class="level-button" id="prevLevel" type="button" disabled="true">&lt;</button>
+      <select class="level-select" id="levelSelect">
+      </select>
+      <button class="level-button" id="nextLevel" type="button" disabled="true">&gt;</button>
+    </div>
+    <div class="container">
+      <canvas id="yobiCanvas" width="480px" height="401px"></canvas>
+    </div>
+    <div class="container" id="statusContainer" style="display: none">
+      <div id="statusText"></div>
+    </div>
+  </body>
+</html>

@@ -1,0 +1,27 @@
+body {
+  background-color: darkgray;
+  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  color: black;
+}
+
+canvas {
+  border: 1px solid #000000;
+  image-rendering: pixelated;
+}
+
+.container {
+  padding: 10px
+}
+
+.input-label {
+  display: inline;
+}
+
+.level-button {
+  display: inline;
+}
+
+.level-select {
+  display: inline;
+  width: 200px
+}
