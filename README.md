@@ -5,3 +5,4 @@ Experimental tools for researching **Spelling Jungle** (1993, Windows), also kno
 The following tools are available:
 
 * [`yobi.html`](https://murugo.github.io/Spelling-Jungle-Tools/yobi.html) - Level Viewer
+* [`voice.html`](https://murugo.github.io/Spelling-Jungle-Tools/voice.html) - Voice Preview
