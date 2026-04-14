@@ -1,0 +1,28 @@
+<html> 
+  <title>Spelling Jungle - Voice Preview</title>
+  <head>
+    <link rel="stylesheet" href="style.css">
+    <script type="text/javascript" src="voice.js"></script>
+  </head>
+  <body>
+    <div class="container">
+      <div class="input-label">Load BSTCDRES.DLL:</div>
+      <input type="file" id="yobiDll" accept=".dll"/>
+    </div>
+    <div class="container">
+      <button id="playSound" type="button" class="audio-control" disabled="true">▶</button>
+      <input type="range" class="audio-control" id="volume" min="0" max="2" value="1" step="0.01" />
+      <div class="audio-control" id="volumeDisplay">100%</div>
+    </div>
+    <div class="container-voice-select">
+      <select id="bankSelect" class="bank-select"></select>
+      <select id="voiceSelect" class="voice-select" size="20"></select>
+    </div>
+    <div class="container">
+      <canvas id="yobiCanvas" width="74px" height="77px"></canvas>
+    </div>
+    <div class="container" id="statusContainer" style="display: none">
+      <div id="statusText"></div>
+    </div>
+  </body>
+</html>

@@ -25,3 +25,22 @@ canvas {
   display: inline;
   width: 200px
 }
+
+.audio-control {
+  display: inline;
+}
+
+.container-voice-select {
+  padding: 10px;
+  width: 300px;
+}
+
+.voice-select {
+  width: 100%;
+  background-color: lightgray;
+}
+
+.bank-select {
+  display: block;
+  width: 100%;
+}
