@@ -57,11 +57,18 @@ const audioContext = new AudioContext();
 const audioGain = audioContext.createGain();
 var voiceLines = new Map();
 var voiceBanks = [];
+var activeBankIndex = -1;
 var activeVoiceId = -1;
 var activeSoundSource;
 var activeSoundStartTime;
+
 var clut = new Uint8ClampedArray(0x400);
-var yobiBitmap;
+var yobiTiledBitmap;
+var yobiBkgBitmap;
+var yobiGameScreenBitmap;
+var yobiCrackersTiledBitmap;
+var yobiStaffTiledBitmap;
+var yobiFeetTiledBitmap;
 
 // {Resource Type ID (int) -> {Resource ID (int) -> DllResource}}
 var dllResourceMap = new Map();
@@ -140,9 +147,9 @@ function parseBitmapResource(resourceId) {
 }
 
 class TiledBitmap {
-  constructor(resourceId, tileHeight) {
-    let imageData = parseBitmapResource(resourceId)
-    this.tileWidth = imageData.width
+  constructor(resourceId, tileHeight, tileWidth) {
+    let imageData = parseBitmapResource(resourceId);
+    this.tileWidth = tileWidth !== undefined ? tileWidth : imageData.width;
     this.tileHeight = tileHeight;
     this.tileCount = Math.floor(imageData.height / tileHeight);
     createImageBitmap(imageData).then((result) => {
@@ -190,6 +197,7 @@ function playVoice(voiceId) {
   if (!voiceId) return;
   voiceLine = voiceLines.get(voiceId);
   activeVoiceId = voiceId;
+  activeBankIndex = parseInt(document.getElementById('bankSelect').value);
 
   if (audioContext.state === "suspended") {
     audioContext.resume();
@@ -207,7 +215,7 @@ function playVoice(voiceId) {
 
 function selectVoiceBank(index) {
   if (index < 0 || index >= voiceBanks.length) return;
-  bank = voiceBanks[index]
+  bank = voiceBanks[index];
 
   const voiceSelect = document.getElementById('voiceSelect');
   voiceSelect.length = 0;
@@ -294,7 +302,20 @@ function buildClut() {
 }
 
 function buildYobiDisplay() {
-  yobiBitmap = new TiledBitmap(901, 77);
+  yobiTiledBitmap = new TiledBitmap(901, 77);
+  yobiCrackersTiledBitmap = new TiledBitmap(954, 47);
+  yobiStaffTiledBitmap = new TiledBitmap(902, 264, 41);
+  yobiFeetTiledBitmap = new TiledBitmap(903, 30);
+
+  let imageData = parseBitmapResource(150);
+  createImageBitmap(imageData).then((result) => {
+    yobiBkgBitmap = result;
+  });
+  imageData = parseBitmapResource(128);
+  createImageBitmap(imageData).then((result) => {
+    yobiGameScreenBitmap = result;
+  })
+
   return true;
 }
 
@@ -302,6 +323,14 @@ function drawYobiDisplay() {
   let c = document.getElementById('yobiCanvas');
   let ctx = c.getContext('2d');
   ctx.clearRect(0, 0, c.width, c.height);
+
+  if (yobiBkgBitmap) {
+    ctx.drawImage(yobiBkgBitmap, 0, 0);
+  }
+  if (yobiGameScreenBitmap) {
+    ctx.drawImage(yobiGameScreenBitmap, 46, 273, 94, 72, 46, 172, 94, 72);
+    ctx.drawImage(yobiGameScreenBitmap, 98, 261, 42, 12, 98, 160, 42, 12);
+  }
 
   let faceIndex = 0;
   if (activeVoiceId > 0 && activeSoundSource !== undefined) {
@@ -312,8 +341,19 @@ function drawYobiDisplay() {
       faceIndex = voiceLine.keyframes[kfIndex];
     }
   }
-  yobiBitmap.draw(0, 0, faceIndex, ctx);
 
+  const useCrackers = activeBankIndex === 10;
+  const useStaff = activeBankIndex === 15;
+
+  const yobiFaceIndex = !useCrackers && !useStaff ? faceIndex : 0;
+  const yobiCrackersFaceIndex = useCrackers ? faceIndex : 0;
+  const yobiStaffFaceIndex = useStaff ? faceIndex : 0;
+
+  yobiTiledBitmap.draw(29, 95, yobiFaceIndex, ctx);
+  yobiCrackersTiledBitmap.draw(98, 113, yobiCrackersFaceIndex, ctx);
+  yobiStaffTiledBitmap.draw(5, 7, yobiStaffFaceIndex, ctx);
+  yobiFeetTiledBitmap.draw(36, 244, 0, ctx);
+  
   window.requestAnimationFrame(drawYobiDisplay);
 }
 
