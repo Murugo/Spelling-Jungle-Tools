@@ -32,25 +32,25 @@ const RS_TYPE_PICT = 0x3F3;
 
 // Voice Banks (Yobi)
 const YOBI_ANIMATION_RESOURCES = [
-  25719,
-  25971,
-  26224,
-  26483,
-  26729,
-  27764,
-  28014,
-  28019,
-  28263,
-  28514,
-  28782,  // TODO: This is Crackers' voice bank, but applying it to Yobi is funny
-  28786,
-  29288,
-  29299,
-  29539,
-  29550,  // TODO: Yobi's staff
-  29552,
-  29556,
-  31086,
+  {id: 25719, nickname: "Words"},
+  {id: 25971, nickname: "Ending (Spoilers)"},
+  {id: 26224, nickname: "Mistake"},
+  {id: 26483, nickname: "Level"},
+  {id: 26729, nickname: "Greetings"},
+  {id: 27764, nickname: "Letters"},
+  {id: 28014, nickname: "Bottom Sentence"},
+  {id: 28019, nickname: "Menus"},
+  {id: 28263, nickname: "Exit"},
+  {id: 28514, nickname: "Gameplay Hints"},
+  {id: 28782, nickname: "Crackers"},
+  {id: 28786, nickname: "Spelling Comments"},
+  {id: 29288, nickname: "Spelling Hints"},
+  {id: 29299, nickname: "Word Repeat"},
+  {id: 29539, nickname: "Word Intro"},
+  {id: 29550, nickname: "Staff"},
+  {id: 29552, nickname: "Wisdom"},
+  {id: 29556, nickname: "Progress"},
+  {id: 31086, nickname: "Idle"},
 ];
 
 const audioContext = new AudioContext();
@@ -231,7 +231,7 @@ function buildVoiceBanks() {
   const bankSelect = document.getElementById('bankSelect');
 
   for (let i = 0; i < YOBI_ANIMATION_RESOURCES.length; ++i) {
-    bankResource = getResource(RS_TYPE_RLSY, YOBI_ANIMATION_RESOURCES[i]);
+    bankResource = getResource(RS_TYPE_RLSY, YOBI_ANIMATION_RESOURCES[i].id);
     bank = []
     const count = bankResource.bytes.getUint16(0x00, true);
     let offset = 0x02;
@@ -260,7 +260,7 @@ function buildVoiceBanks() {
 
     let option = document.createElement('option');
     option.value = i;
-    option.innerHTML = `Bank ${YOBI_ANIMATION_RESOURCES[i]}`;
+    option.innerHTML = `Bank ${YOBI_ANIMATION_RESOURCES[i].id} - ${YOBI_ANIMATION_RESOURCES[i].nickname}`;
     bankSelect.appendChild(option);
   }
 
