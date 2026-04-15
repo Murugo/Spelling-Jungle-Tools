@@ -13,8 +13,28 @@ canvas {
   padding: 10px
 }
 
+.container-input {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  padding: 10px
+}
+
+.container-voice-display {
+  display: grid;
+  align-items: center;
+  justify-items: center;
+  grid-template-columns: 150px 400px;
+  padding: 10px
+}
+
+.container-audio {
+  display: grid;
+  grid-template-columns: 40px auto auto;
+  margin-top: 5px;
+}
+
 .input-label {
-  display: inline;
+  margin-right: 10px;
 }
 
 .level-button {
@@ -30,17 +50,21 @@ canvas {
   display: inline;
 }
 
-.container-voice-select {
-  padding: 10px;
-  width: 300px;
-}
-
 .voice-select {
-  width: 100%;
+  width: 400px;
+  height: 46ch;
   background-color: lightgray;
 }
 
 .bank-select {
   display: block;
   width: 100%;
+  height: 4ch;
+}
+
+.yobi-canvas {
+  display: inline;
+  justify-content: center;
+  align-items: center;
+  border: 1px solid #888888;
 }
