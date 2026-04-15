@@ -1,6 +1,6 @@
 body {
   background-color: darkgray;
-  font-family:'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+  font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
   color: black;
 }
 
@@ -54,6 +54,7 @@ canvas {
   width: 400px;
   height: 46ch;
   background-color: lightgray;
+  font-family: 'Courier New', Courier, monospace;
 }
 
 .bank-select {

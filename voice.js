@@ -25,6 +25,7 @@ const SYSTEM_COLORS_UPPER = [
 ];
 
 // Resource Types
+const RS_TYPE_STR = 0x3ED;
 const RS_TYPE_RLSY = 0x3EC;
 const RS_TYPE_SND = 0x3EE;
 const RS_TYPE_CLUT = 0x3EF;
@@ -69,6 +70,7 @@ var yobiGameScreenBitmap;
 var yobiCrackersTiledBitmap;
 var yobiStaffTiledBitmap;
 var yobiFeetTiledBitmap;
+var wordList = [];
 
 // {Resource Type ID (int) -> {Resource ID (int) -> DllResource}}
 var dllResourceMap = new Map();
@@ -222,7 +224,13 @@ function selectVoiceBank(index) {
   for (let i = 0; i < bank.length; ++i) {
     let option = document.createElement('option');
     option.value = bank[i];
-    option.innerHTML = `${bank[i]}`;
+    if (index === 0) {
+      option.innerHTML = `[${bank[i]}] ${wordList[i]}`;
+    } else if (index === 5) {
+      option.innerHTML = `[${bank[i]}] ${String.fromCharCode(0x41 + i)}`;
+    } else {
+      option.innerHTML = `[${bank[i]}]`;
+    }
     voiceSelect.appendChild(option);
   }
 }
@@ -263,10 +271,6 @@ function buildVoiceBanks() {
     option.innerHTML = `Bank ${YOBI_ANIMATION_RESOURCES[i].id} - ${YOBI_ANIMATION_RESOURCES[i].nickname}`;
     bankSelect.appendChild(option);
   }
-
-  // Select the first bank in the list
-  selectVoiceBank(0);
-
   return true;
 }
 
@@ -297,6 +301,22 @@ function buildClut() {
     clut[i * 4 + 1] = SYSTEM_COLORS_UPPER[(i - 246) * 4 + 1];
     clut[i * 4 + 2] = SYSTEM_COLORS_UPPER[(i - 246) * 4 + 2];
     clut[i * 4 + 3] = SYSTEM_COLORS_UPPER[(i - 246) * 4 + 3];
+  }
+  return true;
+}
+
+function buildWordList() {
+  wordListResource = getResource(RS_TYPE_STR, 201);
+  if (!wordListResource) return false;
+  const count = wordListResource.bytes.getUint16(0x00, true);
+  let offset = 0x02;
+  for (let i = 0; i < count; ++i) {
+    let len = wordListResource.bytes.getUint8(offset++);
+    let str = '';
+    for (let j = 0; j < len; ++j) {
+      str += String.fromCharCode(wordListResource.bytes.getUint8(offset++));
+    }
+    wordList.push(str);
   }
   return true;
 }
@@ -398,7 +418,11 @@ function openDll(file) {
     if (!parseDll(new DataView(dllBytes))) return;
     if (!buildVoiceBanks()) return;
     if (!buildClut()) return;
+    if (!buildWordList()) return;
     if (!buildYobiDisplay()) return;
+
+    // Select the first bank in the list
+    selectVoiceBank(0);
 
     document.getElementById('playSound').disabled = false;
     window.requestAnimationFrame(drawYobiDisplay);
