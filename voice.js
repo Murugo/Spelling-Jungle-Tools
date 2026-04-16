@@ -255,7 +255,12 @@ function buildVoiceBanks() {
       for (let j = 0; j < kfPairCount; ++j) {
         const kfCount = bankResource.bytes.getUint16(offset + j * 0x04 + 0x02, true);
         for (let k = 0; k < kfCount; ++k) {
-          keyframes.push(bankResource.bytes.getUint16(offset + j * 0x04, true));
+          let value = bankResource.bytes.getInt16(offset + j * 0x04, true);
+          if (value < 0) {
+            keyframes.push(j === 0 ? 0 : keyframes[keyframes.length - 1]);
+          } else {
+            keyframes.push(value);
+          }
         }
       }
       offset += kfPairCount * 0x04;
@@ -369,9 +374,13 @@ function drawYobiDisplay() {
   const yobiCrackersFaceIndex = useCrackers ? faceIndex : 0;
   const yobiStaffFaceIndex = useStaff ? faceIndex : 0;
 
+  yobiStaffTiledBitmap.draw(5, 7, yobiStaffFaceIndex, ctx);
+
+  // Hide left side of Yobi's head in staff bitmap with part of the background
+  ctx.drawImage(yobiBkgBitmap, 31, 101, 16, 48, 31, 101, 16, 48);
+
   yobiTiledBitmap.draw(29, 95, yobiFaceIndex, ctx);
   yobiCrackersTiledBitmap.draw(98, 113, yobiCrackersFaceIndex, ctx);
-  yobiStaffTiledBitmap.draw(5, 7, yobiStaffFaceIndex, ctx);
   yobiFeetTiledBitmap.draw(36, 244, 0, ctx);
   
   window.requestAnimationFrame(drawYobiDisplay);

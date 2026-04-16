@@ -457,7 +457,7 @@ function drawLevel() {
   let c = document.getElementById('yobiCanvas');
   let ctx = c.getContext('2d');
   ctx.clearRect(0, 0, c.width, c.height);
-  ctx.fillStyle = "black";
+  ctx.fillStyle = `rgb(255, 255, 217)`;
   ctx.fillRect(0, 384, 480, 400);
 
   level.draw(ctx)
