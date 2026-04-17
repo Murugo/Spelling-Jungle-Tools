@@ -35,13 +35,13 @@ const RS_TYPE_PICT = 0x3F3;
 const YOBI_ANIMATION_RESOURCES = [
   {id: 25719, nickname: "Words"},
   {id: 25971, nickname: "Ending (Spoilers)"},
-  {id: 26224, nickname: "Mistake"},
+  {id: 26224, nickname: "After a Mistake"},
   {id: 26483, nickname: "Level"},
   {id: 26729, nickname: "Greetings"},
   {id: 27764, nickname: "Letters"},
   {id: 28014, nickname: "Bottom Sentence"},
   {id: 28019, nickname: "Menus"},
-  {id: 28263, nickname: "Exit"},
+  {id: 28263, nickname: "Whoops!"},
   {id: 28514, nickname: "Gameplay Hints"},
   {id: 28782, nickname: "Crackers"},
   {id: 28786, nickname: "Spelling Comments"},
@@ -225,9 +225,17 @@ function selectVoiceBank(index) {
     let option = document.createElement('option');
     option.value = bank[i];
     if (index === 0) {
-      option.innerHTML = `[${bank[i]}] ${wordList[i]}`;
+      const text = wordList[i];
+      option.innerHTML = `[${bank[i]}] ${text}`;
+      option.title = text;
     } else if (index === 5) {
-      option.innerHTML = `[${bank[i]}] ${String.fromCharCode(0x41 + i)}`;
+      const text = String.fromCharCode(0x41 + i);
+      option.innerHTML = `[${bank[i]}] ${text}`;
+      option.title = text;
+    } else if (voiceLineNicknames.has(bank[i])) {
+      const text = voiceLineNicknames.get(bank[i]);
+      option.innerHTML = `[${bank[i]}] ${text}`;
+      option.title = text;
     } else {
       option.innerHTML = `[${bank[i]}]`;
     }
