@@ -11,7 +11,13 @@
       <input type="file" id="yobiDll" accept=".dll"/>
     </div>
     <div class="container-voice-display">
-      <canvas class="yobi-canvas" id="yobiCanvas" width="148px" height="300px"></canvas>
+      <div class="container-yobi-display">
+        <canvas class="yobi-canvas" id="yobiCanvas" width="148px" height="300px"></canvas>
+        <label for="showBackground" class="checkbox-show-background">
+          <input type="checkbox" id="showBackground" checked="true" disabled="true">Show Background
+        </label>
+        <input type="color" class="background-color" id="backgroundColor" value="#A0A0A0">
+      </div>
       <div>
         <select id="bankSelect" class="bank-select"></select>
         <select id="voiceSelect" class="voice-select" size="20"></select>

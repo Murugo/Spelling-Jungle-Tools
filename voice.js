@@ -64,9 +64,11 @@ var activeSoundSource;
 var activeSoundStartTime;
 
 var clut = new Uint8ClampedArray(0x400);
+var clutNoBkg = new Uint8ClampedArray(0x400);
 var yobiTiledBitmap;
 var yobiBkgBitmap;
 var yobiGameScreenBitmap;
+var yobiGameScreenNoBkgBitmap;
 var yobiCrackersTiledBitmap;
 var yobiStaffTiledBitmap;
 var yobiFeetTiledBitmap;
@@ -109,7 +111,10 @@ function getResource(typeId, resourceId) {
   return resourceIdMap.get(resourceId);
 }
 
-function parseBitmapResource(resourceId) {
+function parseBitmapResource(resourceId, clutSrc) {
+  if (clutSrc === undefined) {
+    clutSrc = clut;
+  }
   var resource = getResource(RS_TYPE_PICT, resourceId);
   if (!resource) {
     console.error(`Bitmap resource not found: ${resourceId}`)
@@ -127,20 +132,20 @@ function parseBitmapResource(resourceId) {
       let index = resource.bytes.getUint8(src++);
       ctrl = 1 - ctrl;
       while (--ctrl >= 0) {
-        pixelArray[dst + 0] = clut[index * 4 + 0];
-        pixelArray[dst + 1] = clut[index * 4 + 1];
-        pixelArray[dst + 2] = clut[index * 4 + 2];
-        pixelArray[dst + 3] = clut[index * 4 + 3];
+        pixelArray[dst + 0] = clutSrc[index * 4 + 0];
+        pixelArray[dst + 1] = clutSrc[index * 4 + 1];
+        pixelArray[dst + 2] = clutSrc[index * 4 + 2];
+        pixelArray[dst + 3] = clutSrc[index * 4 + 3];
         dst += 4;
       }
     } else {
       ctrl++;
       while (--ctrl >= 0) {
         let index = resource.bytes.getUint8(src++);
-        pixelArray[dst + 0] = clut[index * 4 + 0];
-        pixelArray[dst + 1] = clut[index * 4 + 1];
-        pixelArray[dst + 2] = clut[index * 4 + 2];
-        pixelArray[dst + 3] = clut[index * 4 + 3];
+        pixelArray[dst + 0] = clutSrc[index * 4 + 0];
+        pixelArray[dst + 1] = clutSrc[index * 4 + 1];
+        pixelArray[dst + 2] = clutSrc[index * 4 + 2];
+        pixelArray[dst + 3] = clutSrc[index * 4 + 3];
         dst += 4;
       }
     }
@@ -315,6 +320,18 @@ function buildClut() {
     clut[i * 4 + 2] = SYSTEM_COLORS_UPPER[(i - 246) * 4 + 2];
     clut[i * 4 + 3] = SYSTEM_COLORS_UPPER[(i - 246) * 4 + 3];
   }
+
+  // Fill copy of CLUT with background pixels cut out
+  for (let i = 0; i < clut.length && i < clutNoBkg.length; ++i) {
+    clutNoBkg[i] = clut[i];
+  }
+  clutNoBkg[70 * 4 + 3] = 0;
+  clutNoBkg[115 * 4 + 3] = 0;
+  clutNoBkg[116 * 4 + 3] = 0;
+  clutNoBkg[117 * 4 + 3] = 0;
+  clutNoBkg[148 * 4 + 3] = 0;
+  clutNoBkg[165 * 4 + 3] = 0;
+  clutNoBkg[55 * 4 + 3] = 0;
   return true;
 }
 
@@ -348,6 +365,10 @@ function buildYobiDisplay() {
   createImageBitmap(imageData).then((result) => {
     yobiGameScreenBitmap = result;
   })
+  imageData = parseBitmapResource(128, clutNoBkg);
+  createImageBitmap(imageData).then((result) => {
+    yobiGameScreenNoBkgBitmap = result;
+  });
 
   return true;
 }
@@ -357,12 +378,24 @@ function drawYobiDisplay() {
   let ctx = c.getContext('2d');
   ctx.clearRect(0, 0, c.width, c.height);
 
-  if (yobiBkgBitmap) {
-    ctx.drawImage(yobiBkgBitmap, 0, 0);
-  }
-  if (yobiGameScreenBitmap) {
-    ctx.drawImage(yobiGameScreenBitmap, 46, 273, 94, 72, 46, 172, 94, 72);
-    ctx.drawImage(yobiGameScreenBitmap, 98, 261, 42, 12, 98, 160, 42, 12);
+  ctx.fillStyle = document.getElementById('backgroundColor').value;
+  ctx.fillRect(0, 0, c.width, c.height);
+
+  const showBkg = document.getElementById('showBackground').checked;
+
+  if (showBkg) {
+    if (yobiBkgBitmap) {
+      ctx.drawImage(yobiBkgBitmap, 0, 0);
+    }
+    if (yobiGameScreenBitmap) {
+      ctx.drawImage(yobiGameScreenBitmap, 46, 273, 94, 72, 46, 172, 94, 72);
+      ctx.drawImage(yobiGameScreenBitmap, 98, 261, 42, 12, 98, 160, 42, 12);
+    }
+  } else {
+    if (yobiGameScreenNoBkgBitmap) {
+      ctx.drawImage(yobiGameScreenNoBkgBitmap, 46, 273, 94, 72, 46, 172, 94, 72);
+      ctx.drawImage(yobiGameScreenNoBkgBitmap, 98, 261, 42, 12, 98, 160, 42, 12);
+    }
   }
 
   let faceIndex = 0;
@@ -382,12 +415,22 @@ function drawYobiDisplay() {
   const yobiCrackersFaceIndex = useCrackers ? faceIndex : 0;
   const yobiStaffFaceIndex = useStaff ? faceIndex : 0;
 
-  yobiStaffTiledBitmap.draw(5, 7, yobiStaffFaceIndex, ctx);
+  if (useStaff) {
+    yobiStaffTiledBitmap.draw(5, 7, yobiStaffFaceIndex, ctx);
+  } else {
+    // Cut Yobi's right ear out in the staff bitmap
+    ctx.drawImage(yobiStaffTiledBitmap.imageBitmap, 0, 0, 42, 82, 5, 7, 42, 82);
+    ctx.drawImage(yobiStaffTiledBitmap.imageBitmap, 0, 82, 25, 60, 5, 89, 25, 60);
+    ctx.drawImage(yobiStaffTiledBitmap.imageBitmap, 0, 142, 42, 122, 5, 149, 42, 122);
+  }
 
-  // Hide left side of Yobi's head in staff bitmap with part of the background
-  ctx.drawImage(yobiBkgBitmap, 31, 101, 16, 48, 31, 101, 16, 48);
-
-  yobiTiledBitmap.draw(29, 95, yobiFaceIndex, ctx);
+  if (useStaff) {
+    // Cut part of staff that shows in Yobi's spritesheet.
+    ctx.drawImage(yobiTiledBitmap.imageBitmap, 0, 0, 72, 49, 29, 95, 72, 49);
+    ctx.drawImage(yobiTiledBitmap.imageBitmap, 2, 49, 70, 28, 31, 144, 70, 28);
+  } else {
+    yobiTiledBitmap.draw(29, 95, yobiFaceIndex, ctx);
+  }
   yobiCrackersTiledBitmap.draw(98, 113, yobiCrackersFaceIndex, ctx);
   yobiFeetTiledBitmap.draw(36, 244, 0, ctx);
   
@@ -442,6 +485,7 @@ function openDll(file) {
     selectVoiceBank(0);
 
     document.getElementById('playSound').disabled = false;
+    document.getElementById('showBackground').disabled = false;
     window.requestAnimationFrame(drawYobiDisplay);
     // showStatus("OK");
   };
@@ -462,7 +506,7 @@ function onLoad() {
       playVoice(parseInt(voiceSelect.value));
     }
   });
-  document.getElementById('volume').addEventListener("input", function() {
+  document.getElementById('volume').addEventListener('input', function() {
     audioGain.gain.value = this.value;
     const volumeDisplay = document.getElementById('volumeDisplay');
     volumeDisplay.innerHTML = `${(this.value * 100).toFixed(0)}%`;
@@ -479,6 +523,9 @@ function onLoad() {
     if ((e.key === ' ' || e.key === 'Enter') && !e.repeat && this.value) {
       playVoice(parseInt(this.value));
     }
+  });
+  document.getElementById('showBackground').addEventListener('click', function() {
+    document.getElementById('backgroundColor').style.visibility = this.checked ? 'hidden' : 'visible';
   });
 }
 

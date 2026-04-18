@@ -9,6 +9,10 @@ canvas {
   image-rendering: pixelated;
 }
 
+input[type="checkbox"] {
+    vertical-align: middle;
+}
+
 .container {
   padding: 10px
 }
@@ -25,6 +29,11 @@ canvas {
   justify-items: center;
   grid-template-columns: 200px 400px;
   padding: 10px
+}
+
+.container-yobi-display {
+  display: grid;
+  place-items: center;
 }
 
 .container-audio {
@@ -67,4 +76,14 @@ canvas {
   justify-content: center;
   align-items: center;
   border: 1px solid #888888;
+}
+
+.checkbox-show-background {
+  display: block;
+  margin-top: 10px;
+}
+
+.background-color {
+  margin-top: 10px;
+  visibility: hidden;
 }
