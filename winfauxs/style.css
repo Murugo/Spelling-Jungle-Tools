@@ -1,0 +1,119 @@
+body {
+  /*background-color: darkgray;*/
+  background-color: rgb(80, 130, 86);
+  font-family:Arial, Helvetica, sans-serif;
+  color: black;
+  -webkit-user-select: none;  /* Safari */
+  -ms-user-select: none;      /* IE 10, IE 11 */
+  user-select: none;
+  margin: 0px;
+  overflow: hidden;
+}
+
+.view-window {
+  display: grid;
+  grid-template-columns: 4px minmax(0, 1fr) 4px;
+  grid-template-rows: 4px auto 4px;
+  width: 500px;
+  height: 250px;
+  min-width: 200px;
+  min-height: 200px;
+  background-color: #E0E0E0;
+  position: absolute;
+  z-index: 100;
+  --xpos: 0;
+  --ypos: 0;
+  transform: translate(
+    calc(var(--xpos) * 1px),
+    calc(var(--ypos) * 1px)
+  );
+}
+
+.view-window-border-nw {
+  width: 4px;
+  height: 4px;
+  background-color: lightgray;
+  box-shadow: 0 1px inset white, 1px 0 inset darkgray;
+  cursor: nw-resize;
+}
+
+.view-window-border-n {
+  width: 100%;
+  height: 4px;
+  background-color: lightgray;
+  box-shadow: 0 1px inset white, 0 -1px inset darkgray;
+  cursor: n-resize;
+}
+
+.view-window-border-ne {
+  width: 4px;
+  height: 4px;
+  background-color: lightgray;
+  box-shadow: 0 1px inset white, -1px 0 inset darkgray;
+  cursor: ne-resize;
+}
+
+.view-window-border-w {
+  width: 4px;
+  height: 100%;
+  background-color: lightgray;
+  box-shadow: 1px 0 inset darkgray, -1px 0 inset darkgray;
+  cursor: w-resize;
+}
+
+.view-window-border-e {
+  width: 4px;
+  height: 100%;
+  background-color: lightgray;
+  box-shadow: 1px 0 inset darkgray, -1px 0 inset darkgray;
+  cursor: e-resize;
+}
+
+.view-window-border-sw {
+  width: 4px;
+  height: 4px;
+  background-color: lightgray;
+  box-shadow: 1px 0 inset darkgray, 0 -1px inset darkgray;
+  cursor: sw-resize;
+}
+
+.view-window-border-s {
+  width: 100%;
+  height: 4px;
+  background-color: lightgray;
+  box-shadow: 0 1px inset white, 0 -1px inset darkgray;
+  cursor: s-resize;
+}
+
+.view-window-border-se {
+  width: 4px;
+  height: 4px;
+  background-color: lightgray;
+  box-shadow: -1px 0 inset darkgray, 0 -1px inset darkgray;
+  cursor: se-resize;
+}
+
+.view-window-title {
+  background-color: #0050B0;
+  color: white;
+  font-weight: bold;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  padding: 5px;
+}
+
+.view-window-content {
+  padding: 5px;
+}
+
+#mainWindow {
+  --xpos: 20;
+  --ypos: 20;
+}
+
+#secondaryWindow {
+  --xpos: 100;
+  --ypos: 100;
+}
