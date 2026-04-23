@@ -12,8 +12,8 @@ body {
 
 .view-window {
   display: grid;
-  grid-template-columns: 4px minmax(0, 1fr) 4px;
-  grid-template-rows: 4px auto 4px;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   width: 500px;
   height: 250px;
   min-width: 200px;
@@ -27,6 +27,12 @@ body {
     calc(var(--xpos) * 1px),
     calc(var(--ypos) * 1px)
   );
+}
+
+.view-window[state="maximized"] {
+  width: calc(100% + 8px) !important;
+  height: calc(100% + 8px) !important;
+  transform: translate(-4px, -4px);
 }
 
 .view-window-border-nw {
@@ -57,7 +63,6 @@ body {
   width: 4px;
   height: 100%;
   background-color: lightgray;
-  /* box-shadow: 1px 0 inset darkgray, -1px 0 inset darkgray; */
   box-shadow: 1px 0 inset darkgray;
   cursor: w-resize;
 }
@@ -66,7 +71,6 @@ body {
   width: 4px;
   height: 100%;
   background-color: lightgray;
-  /* box-shadow: 1px 0 inset darkgray, -1px 0 inset darkgray; */
   box-shadow: -1px 0 inset darkgray;
   cursor: e-resize;
 }
@@ -119,7 +123,7 @@ body {
 }
 
 .view-window-title-buttons > button {
-  padding: 5px;
+  padding: 10px;
   border: none;
   aspect-ratio: 1 / 1;
   box-shadow: 0 1px inset white, -1px 0 inset white, 1px 0 inset darkgray, 0 -1px inset darkgray;
@@ -128,6 +132,28 @@ body {
 .view-window-title-buttons > button:active {
   background-color: rgb(199, 199, 199);
   box-shadow: 0 -1px inset gray, 1px 0 inset gray, -1px 0 inset darkgray, 0 1px inset darkgray;
+}
+
+.view-window-minimize {
+  background-image: url("images/title-button-minimize.png");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.view-window-maximize {
+  background-image: url("images/title-button-maximize.png");
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
+.view-window[state="maximized"] .view-window-maximize {
+  background-image: url("images/title-button-windowed.png");
+}
+
+.view-window-close {
+  background-image: url("images/title-button-close.png");
+  background-repeat: no-repeat;
+  background-position: center;
 }
 
 .view-window-content {

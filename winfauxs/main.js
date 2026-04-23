@@ -1,3 +1,5 @@
+const WINDOW_BORDERS = ['nw', 'n', 'ne', 'w', 'e', 'sw', 's', 'se'];
+
 let windows = [];
 let activeWindow;
 
@@ -9,46 +11,22 @@ class ViewBorder {
   }
 
   setUp() {
-    // TODO: Dynamically add divs to the parent element instead of inserting them manually into HTML
-    this.parentElement.querySelector('.view-window-border-nw').addEventListener('mousedown', (event) => {
-      this.viewWindow.setAsActive();
-      this.viewWindow.startResize(event.clientX, event.clientY, event.buttons, ['n', 'w']);
-      document.getElementsByTagName('body')[0].style.cursor = 'nw-resize';
+    this.borderElements = [];
+    WINDOW_BORDERS.forEach((border) => {
+      // TODO: Dynamically add the border to the window element.
+      const element = this.parentElement.querySelector(`.view-window-border-${border}`);
+      element.addEventListener('mousedown', (event) => {
+        this.viewWindow.setAsActive();
+        this.viewWindow.startResize(event.clientX, event.clientY, event.buttons, [...border]);
+        document.getElementsByTagName('body')[0].style.cursor = `${border}-resize`;
+      });
+      this.borderElements.push(element);
     });
-    this.parentElement.querySelector('.view-window-border-n').addEventListener('mousedown', (event) => {
-      this.viewWindow.setAsActive();
-      this.viewWindow.startResize(event.clientX, event.clientY, event.buttons, ['n']);
-      document.getElementsByTagName('body')[0].style.cursor = 'n-resize';
-    });
-    this.parentElement.querySelector('.view-window-border-ne').addEventListener('mousedown', (event) => {
-      this.viewWindow.setAsActive();
-      this.viewWindow.startResize(event.clientX, event.clientY, event.buttons, ['n', 'e']);
-      document.getElementsByTagName('body')[0].style.cursor = 'ne-resize';
-    });
-    this.parentElement.querySelector('.view-window-border-w').addEventListener('mousedown', (event) => {
-      this.viewWindow.setAsActive();
-      this.viewWindow.startResize(event.clientX, event.clientY, event.buttons, ['w']);
-      document.getElementsByTagName('body')[0].style.cursor = 'w-resize';
-    });
-    this.parentElement.querySelector('.view-window-border-e').addEventListener('mousedown', (event) => {
-      this.viewWindow.setAsActive();
-      this.viewWindow.startResize(event.clientX, event.clientY, event.buttons, ['e']);
-      document.getElementsByTagName('body')[0].style.cursor = 'e-resize';
-    });
-    this.parentElement.querySelector('.view-window-border-sw').addEventListener('mousedown', (event) => {
-      this.viewWindow.setAsActive();
-      this.viewWindow.startResize(event.clientX, event.clientY, event.buttons, ['s', 'w']);
-      document.getElementsByTagName('body')[0].style.cursor = 'sw-resize';
-    });
-    this.parentElement.querySelector('.view-window-border-s').addEventListener('mousedown', (event) => {
-      this.viewWindow.setAsActive();
-      this.viewWindow.startResize(event.clientX, event.clientY, event.buttons, ['s']);
-      document.getElementsByTagName('body')[0].style.cursor = 's-resize';
-    });
-    this.parentElement.querySelector('.view-window-border-se').addEventListener('mousedown', (event) => {
-      this.viewWindow.setAsActive();
-      this.viewWindow.startResize(event.clientX, event.clientY, event.buttons, ['s', 'e']);
-      document.getElementsByTagName('body')[0].style.cursor = 'se-resize';
+  }
+
+  setVisibility(visible) {
+    this.borderElements.forEach((element) => {
+      element.style.visibility = visible ? 'visible' : 'hidden';
     });
   }
 }
@@ -65,6 +43,7 @@ class ViewWindow {
     this.resizingBottom = false;
     this.anchorX = 0;
     this.anchorY = 0;
+    this.maximized = false;
     this.setUp();
   }
 
@@ -72,6 +51,8 @@ class ViewWindow {
     this.element = document.getElementById(this.id);
     this.titleElement = this.element.querySelector('.view-window-title');
     this.contentElement = this.element.querySelector('.view-window-content');
+
+    this.viewBorder = new ViewBorder(this, this.element);
 
     this.titleElement.addEventListener('mousedown', (event) => {
       if (event.buttons & 1) {
@@ -81,16 +62,21 @@ class ViewWindow {
         this.dragStartY = event.clientY - style.getPropertyValue('--ypos');
       }
     });
+    this.titleElement.querySelector('.view-window-maximize').addEventListener('click', () => {
+      this.toggleMaximize();
+    });
+    this.titleElement.addEventListener('dblclick', () => {
+      this.toggleMaximize();
+    });
     this.element.addEventListener('mousedown', (event) => {
       this.setAsActive();
     });
-
-    this.viewBorder = new ViewBorder(this, this.element);
 
     this.setAsActive();
   }
 
   handleMouseMove(clientX, clientY, buttons) {
+    if (this.maximized) return;
     if (this.dragging) {
       this.handleMove(clientX, clientY, buttons);
     } else if (this.resizingLeft || this.resizingRight || this.resizingTop || this.resizingBottom) {
@@ -172,6 +158,16 @@ class ViewWindow {
     const y = Math.max(Math.min(style.getPropertyValue('--ypos'), window.innerHeight - 100), 0);
     this.element.style.setProperty('--xpos', x);
     this.element.style.setProperty('--ypos', y);
+  }
+
+  toggleMaximize() {
+    this.maximized = !this.maximized;
+    this.viewBorder.setVisibility(!this.maximized);
+    if (this.maximized) {
+      this.element.setAttribute('state', 'maximized');
+    } else {
+      this.element.removeAttribute('state');
+    }
   }
 
   setAsActive() {
