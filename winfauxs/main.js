@@ -55,6 +55,7 @@ class ViewWindow {
     this.viewBorder = new ViewBorder(this, this.element);
 
     this.titleElement.addEventListener('mousedown', (event) => {
+      if (event.target.tagName === 'BUTTON') return;
       if (event.buttons & 1) {
         this.dragging = true;
         const style = window.getComputedStyle(this.element);
@@ -66,6 +67,7 @@ class ViewWindow {
       this.toggleMaximize();
     });
     this.titleElement.addEventListener('dblclick', () => {
+      if (event.target.tagName === 'BUTTON') return;
       this.toggleMaximize();
     });
     this.element.addEventListener('mousedown', (event) => {
