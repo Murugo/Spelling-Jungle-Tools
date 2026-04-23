@@ -91,7 +91,8 @@ class ViewWindow {
       this.dragging = false;
       return;
     }
-    const x = Math.max(Math.min(clientX - this.dragStartX, window.innerWidth - 100), 0);
+    const style = window.getComputedStyle(this.element);
+    const x = Math.max(Math.min(clientX - this.dragStartX, window.innerWidth - 100), 100 - parseInt(style.width, 10));
     const y = Math.max(Math.min(clientY - this.dragStartY, window.innerHeight - 100), 0);
     this.element.style.setProperty('--xpos', x);
     this.element.style.setProperty('--ypos', y);
@@ -135,21 +136,21 @@ class ViewWindow {
     const minWidth = parseInt(style.minWidth, 10);
     const minHeight = parseInt(style.minHeight, 10);
     if (this.resizingLeft) {
-      const newX = Math.min(Math.max(0, clientX), this.anchorX - minWidth);
+      const newX = Math.min(Math.max(0, Math.min(clientX, window.innerWidth - 100)), this.anchorX - minWidth);
       this.element.style.width = this.anchorX - newX;
       this.element.style.setProperty('--xpos', newX);
     } else if (this.resizingRight) {
-      const newWidth = clientX - this.anchorX;
       const x = parseInt(style.getPropertyValue('--xpos'), 10);
+      const newWidth = Math.max(clientX - this.anchorX, 100 - x);
       this.element.style.width = Math.min(Math.max(newWidth, minWidth), window.innerWidth - x);
     }
     if (this.resizingTop) {
-      const newY = Math.min(Math.max(0, clientY), this.anchorY - minHeight);
+      const newY = Math.min(Math.max(0, Math.min(clientY, window.innerHeight - 100)), this.anchorY - minHeight);
       this.element.style.height = this.anchorY - newY;
       this.element.style.setProperty('--ypos', newY);
     } else if (this.resizingBottom) {
-      const newHeight = clientY - this.anchorY;
       const y = parseInt(style.getPropertyValue('--ypos'), 10);
+      const newHeight = clientY - this.anchorY;
       this.element.style.height = Math.min(Math.max(newHeight, minHeight), window.innerHeight - y);
     }
   }
