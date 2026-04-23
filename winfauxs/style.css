@@ -57,7 +57,8 @@ body {
   width: 4px;
   height: 100%;
   background-color: lightgray;
-  box-shadow: 1px 0 inset darkgray, -1px 0 inset darkgray;
+  /* box-shadow: 1px 0 inset darkgray, -1px 0 inset darkgray; */
+  box-shadow: 1px 0 inset darkgray;
   cursor: w-resize;
 }
 
@@ -65,7 +66,8 @@ body {
   width: 4px;
   height: 100%;
   background-color: lightgray;
-  box-shadow: 1px 0 inset darkgray, -1px 0 inset darkgray;
+  /* box-shadow: 1px 0 inset darkgray, -1px 0 inset darkgray; */
+  box-shadow: -1px 0 inset darkgray;
   cursor: e-resize;
 }
 
@@ -94,14 +96,38 @@ body {
 }
 
 .view-window-title {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
   background-color: #0050B0;
+}
+
+.view-window-title-text {
   color: white;
   font-weight: bold;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+  font-size: 11pt;
   min-width: 0;
+  padding-left: 5px;
+  align-self: center;
+}
+
+.view-window-title-buttons {
+  display: grid;
+  grid-template-columns: auto auto auto;
+}
+
+.view-window-title-buttons > button {
   padding: 5px;
+  border: none;
+  aspect-ratio: 1 / 1;
+  box-shadow: 0 1px inset white, -1px 0 inset white, 1px 0 inset darkgray, 0 -1px inset darkgray;
+}
+
+.view-window-title-buttons > button:active {
+  background-color: rgb(199, 199, 199);
+  box-shadow: 0 -1px inset gray, 1px 0 inset gray, -1px 0 inset darkgray, 0 1px inset darkgray;
 }
 
 .view-window-content {
