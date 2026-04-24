@@ -160,12 +160,63 @@ body {
   padding: 5px;
 }
 
+.icon {
+  display: grid;
+  grid-template-rows: 50px auto;
+  width: 80px;
+  position: absolute;
+  --xpos: 0;
+  --ypos: 0;
+  transform: translate(
+    calc(var(--xpos) * 1px),
+    calc(var(--ypos) * 1px)
+  );
+}
+
+.icon-image {
+  background-image: url("images/icon-placeholder.png");
+  background-repeat: no-repeat;
+  background-position: center;
+  mask-image: url("images/icon-placeholder.png");
+  mask-repeat: no-repeat;
+  mask-position: center;
+}
+
+.icon[state="selected"] > .icon-image {
+  background-color: rgba(0, 100, 255, 1);
+  background-blend-mode: multiply;
+}
+
+.icon-text {
+  margin-top: 5px;
+  font-size: 11pt;
+  max-width: 75px;
+  overflow-wrap: break-word;
+  text-align: center;
+}
+
+.icon[state="selected"] > .icon-text {
+  background-color: rgba(0, 100, 255, 1);
+  color: white;
+  border: 1px dotted white;
+}
+
 #mainWindow {
+  --xpos: 80;
+  --ypos: 80;
+}
+
+#secondaryWindow {
+  --xpos: 120;
+  --ypos: 120;
+}
+
+#mainWindowIcon {
   --xpos: 20;
   --ypos: 20;
 }
 
-#secondaryWindow {
-  --xpos: 100;
-  --ypos: 100;
+#secondaryWindowIcon {
+  --xpos: 20;
+  --ypos: 120;
 }

@@ -1,7 +1,9 @@
 const WINDOW_BORDERS = ['nw', 'n', 'ne', 'w', 'e', 'sw', 's', 'se'];
 
 let windows = [];
+let desktopIcons = [];
 let activeWindow;
+let activeIcon;
 
 class ViewBorder {
   constructor(viewWindow, parentElement) {
@@ -69,6 +71,9 @@ class ViewWindow {
     this.titleElement.addEventListener('dblclick', () => {
       if (event.target.tagName === 'BUTTON') return;
       this.toggleMaximize();
+    });
+    this.titleElement.querySelector('.view-window-close').addEventListener('click', () => {
+      this.hide();
     });
     this.element.addEventListener('mousedown', (event) => {
       this.setAsActive();
@@ -184,15 +189,106 @@ class ViewWindow {
   setPriority(priority) {
     this.element.style.setProperty('z-index', priority)
   }
+
+  hide() {
+    this.element.style.display = 'none';
+  }
+
+  show() {
+    this.element.style.removeProperty('display');
+    this.setAsActive();
+  }
+}
+
+class Icon {
+  constructor(id, viewWindow) {
+    this.id = id;
+    this.viewWindow = viewWindow;
+    this.dragging = false;
+    this.dragStartX = 0;
+    this.dragStartY = 0;
+    this.setUp();
+  }
+
+  setUp() {
+    this.element = document.getElementById(this.id);
+
+    this.element.addEventListener('dblclick', () => {
+      this.viewWindow.show();
+      this.deselect();
+    });
+    this.element.addEventListener('mousedown', (event) => {
+      if (event.buttons & 1) {
+        this.select();
+        this.dragging = true;
+        const style = window.getComputedStyle(this.element);
+        this.dragStartX = event.clientX - style.getPropertyValue('--xpos');
+        this.dragStartY = event.clientY - style.getPropertyValue('--ypos');
+      }
+    });
+  }
+
+  handleMouseMove(clientX, clientY, buttons) {
+    if (this.dragging) {
+      this.handleMove(clientX, clientY, buttons);
+    }
+  }
+
+  handleMove(clientX, clientY, buttons) {
+    if (buttons !== 1) {
+      this.dragging = false;
+      return;
+    }
+    const style = window.getComputedStyle(this.element);
+    const x = Math.max(Math.min(clientX - this.dragStartX, window.innerWidth - 40), 40 - parseInt(style.width, 10));
+    const y = Math.max(Math.min(clientY - this.dragStartY, window.innerHeight - 40), 40 - parseInt(style.height, 10));
+    this.element.style.setProperty('--xpos', x);
+    this.element.style.setProperty('--ypos', y);
+  }
+
+  select() {
+    this.element.setAttribute('state', 'selected');
+    if (activeIcon && activeIcon !== this) {
+      activeIcon.deselect();
+    }
+    activeIcon = this;
+    this.setPriority(100);
+  }
+
+  deselect() {
+    this.element.removeAttribute('state');
+    this.setPriority(1);
+    activeIcon = undefined;
+  }
+
+  setPriority(priority) {
+    this.element.style.setProperty('z-index', priority)
+  }
 }
 
 function onLoad() {
   windows.push(new ViewWindow('mainWindow'));
   windows.push(new ViewWindow('secondaryWindow'));
 
+  desktopIcons.push(new Icon('mainWindowIcon', windows[0]));
+  desktopIcons.push(new Icon('secondaryWindowIcon', windows[1]));
+
+  document.addEventListener('mousedown', (event) => {
+    if (event.buttons !== 1) return;
+    if (!activeIcon) return;
+    for (const name of event.target.classList) {
+      if (name.startsWith('icon')) {
+        return;
+      }
+    }
+    activeIcon.deselect();
+  });
   document.addEventListener('mousemove', (event) => {
     if (activeWindow) {
       activeWindow.handleMouseMove(event.clientX, event.clientY, event.buttons);
+    }
+    if (activeIcon) {
+      activeIcon.handleMouseMove(event.clientX, event.clientY, event.buttons);
     }
   });
   window.addEventListener("resize", () => {
