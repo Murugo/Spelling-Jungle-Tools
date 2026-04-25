@@ -34,7 +34,7 @@ class ViewBorder {
 }
 
 class ViewWindow {
-  constructor(id) {
+  constructor(id, startOpened = true) {
     this.id = id;
     this.dragging = false;
     this.dragStartX = 0;
@@ -46,16 +46,45 @@ class ViewWindow {
     this.anchorX = 0;
     this.anchorY = 0;
     this.maximized = false;
-    this.setUp();
+    this.setUp(startOpened);
   }
 
-  setUp() {
+  setUp(startOpened = true) {
     this.element = document.getElementById(this.id);
     this.titleElement = this.element.querySelector('.view-window-title');
     this.contentElement = this.element.querySelector('.view-window-content');
 
+    const style = window.getComputedStyle(this.element);
+    this.iconUrl = style.getPropertyValue('--icon');
+    this.title = style.getPropertyValue('--title').trim().replaceAll("\"", "");
+    this.titleElement.querySelector('.view-window-title-text').innerHTML = this.title;
+
     this.viewBorder = new ViewBorder(this, this.element);
 
+    this.createEvents();
+    if (startOpened) {
+      this.show(/*opened=*/true);
+    } else {
+      this.hide(/*closed=*/true);
+    }
+  }
+
+  addToTaskbar() {
+    this.taskbarElement = document.createElement('div');
+    this.taskbarElement.className = 'taskbar-view-window';
+    this.taskbarElement.innerHTML = this.title;
+    this.taskbarElement.style.backgroundImage = this.iconUrl;
+    this.taskbarElement.addEventListener('mousedown', (event) => {
+      if (activeWindow !== this) {
+        this.show(/*opened=*/false);
+      } else {
+        this.hide(/*closed=*/false);
+      }
+    });
+    document.getElementById('taskbarWindows').appendChild(this.taskbarElement);
+  }
+
+  createEvents() {
     this.titleElement.addEventListener('mousedown', (event) => {
       if (event.target.tagName === 'BUTTON') return;
       if (event.buttons & 1) {
@@ -65,6 +94,9 @@ class ViewWindow {
         this.dragStartY = event.clientY - style.getPropertyValue('--ypos');
       }
     });
+    this.titleElement.querySelector('.view-window-minimize').addEventListener('click', () => {
+      this.hide(/*closed=*/false);
+    });
     this.titleElement.querySelector('.view-window-maximize').addEventListener('click', () => {
       this.toggleMaximize();
     });
@@ -73,13 +105,11 @@ class ViewWindow {
       this.toggleMaximize();
     });
     this.titleElement.querySelector('.view-window-close').addEventListener('click', () => {
-      this.hide();
+      this.hide(/*closed=*/true);
     });
     this.element.addEventListener('mousedown', (event) => {
       this.setAsActive();
     });
-
-    this.setAsActive();
   }
 
   handleMouseMove(clientX, clientY, buttons) {
@@ -180,22 +210,45 @@ class ViewWindow {
 
   setAsActive() {
     if (activeWindow) {
-      activeWindow.setPriority(1);
+      activeWindow.setNotActive();
     }
     this.setPriority(100);
     activeWindow = this;
+    this.titleElement.setAttribute('state', 'active');
+    if (this.taskbarElement) {
+      this.taskbarElement.setAttribute('state', 'active');
+    }
+  }
+
+  setNotActive() {
+    this.setPriority(1);
+    if (activeWindow === this) {
+      activeWindow = undefined;
+    }
+    this.titleElement.removeAttribute('state');
+    if (this.taskbarElement) {
+      this.taskbarElement.removeAttribute('state');
+    }
   }
 
   setPriority(priority) {
     this.element.style.setProperty('z-index', priority)
   }
 
-  hide() {
+  hide(closed) {
     this.element.style.display = 'none';
+    if (closed && this.taskbarElement) {
+      document.getElementById('taskbarWindows').removeChild(this.taskbarElement);
+      this.taskbarElement = undefined;
+    }
+    this.setNotActive();
   }
 
-  show() {
+  show(opened) {
     this.element.style.removeProperty('display');
+    if (opened && !this.taskbarElement) {
+      this.addToTaskbar();
+    }
     this.setAsActive();
   }
 }
@@ -214,7 +267,7 @@ class Icon {
     this.element = document.getElementById(this.id);
 
     this.element.addEventListener('dblclick', () => {
-      this.viewWindow.show();
+      this.viewWindow.show(/*opened=*/true);
       this.deselect();
     });
     this.element.addEventListener('mousedown', (event) => {
@@ -267,8 +320,8 @@ class Icon {
 }
 
 function onLoad() {
-  windows.push(new ViewWindow('mainWindow'));
-  windows.push(new ViewWindow('secondaryWindow'));
+  windows.push(new ViewWindow('mainWindow', /*startOpened=*/false));
+  windows.push(new ViewWindow('secondaryWindow', /*startOpened=*/false));
 
   desktopIcons.push(new Icon('mainWindowIcon', windows[0]));
   desktopIcons.push(new Icon('secondaryWindowIcon', windows[1]));

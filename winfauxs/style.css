@@ -1,7 +1,8 @@
 body {
   /*background-color: darkgray;*/
   background-color: rgb(80, 130, 86);
-  font-family:Arial, Helvetica, sans-serif;
+  font-family: Arial, Helvetica, sans-serif;
+  font-size: 12pt;
   color: black;
   -webkit-user-select: none;  /* Safari */
   -ms-user-select: none;      /* IE 10, IE 11 */
@@ -23,6 +24,8 @@ body {
   z-index: 100;
   --xpos: 0;
   --ypos: 0;
+  --title: "Default";
+  --icon: url("images/icon-placeholder.png");
   transform: translate(
     calc(var(--xpos) * 1px),
     calc(var(--ypos) * 1px)
@@ -31,7 +34,7 @@ body {
 
 .view-window[state="maximized"] {
   width: calc(100% + 8px) !important;
-  height: calc(100% + 8px) !important;
+  height: calc(100% + 8px - 30px) !important;
   transform: translate(-4px, -4px);
 }
 
@@ -102,6 +105,15 @@ body {
 .view-window-title {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto auto;
+  background-color: #6a8fe4;
+  background-image: var(--icon);
+  background-repeat: no-repeat;
+  background-position-x: 4px;
+  background-position-y: center;
+  background-size: 16px;
+}
+
+.view-window-title[state="active"] {
   background-color: #0050B0;
 }
 
@@ -113,7 +125,7 @@ body {
   white-space: nowrap;
   font-size: 11pt;
   min-width: 0;
-  padding-left: 5px;
+  padding-left: 24px;
   align-self: center;
 }
 
@@ -201,14 +213,88 @@ body {
   border: 1px dotted white;
 }
 
+.taskbar {
+  display: flex;
+  align-items: center;
+  background-color: darkgray;
+  box-shadow: 0 1px inset gray, 0 2px inset white;
+  position: fixed;
+  width: 100%;
+  height: 30px;
+  gap: 4px;
+  bottom: 0;
+  left: 0;
+  z-index: 200;
+}
+
+.taskbar-start-button {
+  background-image: url("images/taskbar-start.png");
+  background-repeat: no-repeat;
+  background-position-x: 4px;
+  background-position-y: center;
+  padding-left: 24px;
+  margin-left: 4px;
+  color: black;
+  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+  text-align: right;
+  background-color: darkgray;
+  border: none;
+  font-weight: bold;
+}
+
+.taskbar-start-button:active {
+  background-color: rgb(114, 114, 114);
+}
+
+.taskbar-separator {
+  border-left: 1px solid black;
+  border-right: 1px solid white;
+  height: 75%;
+}
+
+.taskbar-windows {
+  display: flex;
+  flex: 0 0 0;
+  align-items: center;
+  gap: 4px;
+  height: 100%;
+}
+
+.taskbar-view-window {
+  background-image: url("images/icon-placeholder.png");
+  background-repeat: no-repeat;
+  background-position-x: 4px;
+  background-position-y: center;
+  background-size: 16px;
+  padding-left: 24px;
+  padding-right: 8px;
+  box-shadow: 0 1px inset white, -1px 0 inset white, 1px 0 inset gray, 0 -1px inset gray;
+  height: 24px;
+  line-height: 24px;
+  color: black;
+  font-size: 10pt;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  min-width: 0;
+  width: 200px;
+}
+
+.taskbar-view-window[state="active"] {
+  box-shadow: 0 -1px inset white, 1px 0 inset white, -1px 0 inset gray, 0 1px inset gray;
+  background-color: lightgray;
+}
+
 #mainWindow {
   --xpos: 80;
   --ypos: 80;
+  --title: "Main Window";
 }
 
 #secondaryWindow {
   --xpos: 120;
   --ypos: 120;
+  --title: "Secondary Window With A Very, Very Long Title";
 }
 
 #mainWindowIcon {
