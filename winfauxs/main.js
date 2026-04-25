@@ -212,7 +212,7 @@ class ViewWindow {
     if (activeWindow) {
       activeWindow.setNotActive();
     }
-    this.setPriority(100);
+    this.setPriority(21);
     activeWindow = this;
     this.titleElement.setAttribute('state', 'active');
     if (this.taskbarElement) {
@@ -221,7 +221,7 @@ class ViewWindow {
   }
 
   setNotActive() {
-    this.setPriority(1);
+    this.setPriority(20);
     if (activeWindow === this) {
       activeWindow = undefined;
     }
@@ -232,7 +232,7 @@ class ViewWindow {
   }
 
   setPriority(priority) {
-    this.element.style.setProperty('z-index', priority)
+    this.element.style.zIndex = priority;
   }
 
   hide(closed) {
@@ -305,17 +305,17 @@ class Icon {
       activeIcon.deselect();
     }
     activeIcon = this;
-    this.setPriority(100);
+    this.setPriority(11);
   }
 
   deselect() {
     this.element.removeAttribute('state');
-    this.setPriority(1);
+    this.setPriority(10);
     activeIcon = undefined;
   }
 
   setPriority(priority) {
-    this.element.style.setProperty('z-index', priority)
+    this.element.style.zIndex = priority
   }
 }
 
