@@ -111,6 +111,7 @@ body {
   background-position-x: 4px;
   background-position-y: center;
   background-size: 16px;
+  min-height: 20px;
 }
 
 .view-window-title[state="active"] {

@@ -1,6 +1,13 @@
 const WINDOW_BORDERS_BEFORE = ['nw', 'n', 'ne', 'w'];
 const WINDOW_BORDERS_AFTER = ['e', 'sw', 's', 'se'];
 
+const titleButton = {
+  NONE: 0,
+  MINIMIZE: 1,
+  MAXIMIZE: 2,
+  CLOSE: 4,
+};
+
 let windows = [];
 let desktopIcons = [];
 let activeWindow;
@@ -46,7 +53,7 @@ class ViewBorder {
 }
 
 class ViewWindow {
-  constructor(id, startOpened = true) {
+  constructor(id, startOpened = true, titleButtons = titleButton.MINIMIZE | titleButton.MAXIMIZE | titleButton.CLOSE) {
     this.id = id;
     this.dragging = false;
     this.dragStartX = 0;
@@ -58,10 +65,10 @@ class ViewWindow {
     this.anchorX = 0;
     this.anchorY = 0;
     this.maximized = false;
-    this.setUp(startOpened);
+    this.setUp(startOpened, titleButtons);
   }
 
-  setUp(startOpened = true) {
+  setUp(startOpened, titleButtons) {
     this.element = document.getElementById(this.id);
     this.titleElement = this.element.querySelector('.view-window-title');
     this.contentElement = this.element.querySelector('.view-window-content');
@@ -70,6 +77,7 @@ class ViewWindow {
     this.iconUrl = style.getPropertyValue('--icon');
     this.title = style.getPropertyValue('--title').trim().replaceAll("\"", "");
     this.titleElement.querySelector('.view-window-title-text').innerHTML = this.title;
+    this.addTitleButtons(titleButtons);
 
     this.viewBorder = new ViewBorder(this, this.element);
 
@@ -78,6 +86,26 @@ class ViewWindow {
       this.show(/*opened=*/true);
     } else {
       this.hide(/*closed=*/true);
+    }
+  }
+
+  addTitleButtons(titleButtons) {
+    const buttonContainer = this.titleElement.querySelector('.view-window-title-buttons');
+    if (!buttonContainer) return;
+    if (titleButtons & titleButton.MINIMIZE) {
+      this.minimizeButtonElement = document.createElement('button');
+      this.minimizeButtonElement.className = 'view-window-minimize';
+      buttonContainer.appendChild(this.minimizeButtonElement);
+    }
+    if (titleButtons & titleButton.MAXIMIZE) {
+      this.maximizeButtonElement = document.createElement('button');
+      this.maximizeButtonElement.className = 'view-window-maximize';
+      buttonContainer.appendChild(this.maximizeButtonElement);
+    }
+    if (titleButtons & titleButton.CLOSE) {
+      this.closeButtonElement = document.createElement('button');
+      this.closeButtonElement.className = 'view-window-close';
+      buttonContainer.appendChild(this.closeButtonElement);
     }
   }
 
@@ -106,19 +134,25 @@ class ViewWindow {
         this.dragStartY = event.clientY - style.getPropertyValue('--ypos');
       }
     });
-    this.titleElement.querySelector('.view-window-minimize').addEventListener('click', () => {
-      this.hide(/*closed=*/false);
-    });
-    this.titleElement.querySelector('.view-window-maximize').addEventListener('click', () => {
-      this.toggleMaximize();
-    });
-    this.titleElement.addEventListener('dblclick', () => {
-      if (event.target.tagName === 'BUTTON') return;
-      this.toggleMaximize();
-    });
-    this.titleElement.querySelector('.view-window-close').addEventListener('click', () => {
-      this.hide(/*closed=*/true);
-    });
+    if (this.minimizeButtonElement) {
+      this.minimizeButtonElement.addEventListener('click', () => {
+        this.hide(/*closed=*/false);
+      });
+    }
+    if (this.maximizeButtonElement) {
+      this.maximizeButtonElement.addEventListener('click', () => {
+        this.toggleMaximize();
+      });
+      this.titleElement.addEventListener('dblclick', () => {
+        if (event.target.tagName === 'BUTTON') return;
+        this.toggleMaximize();
+      });
+    }
+    if (this.closeButtonElement) {
+      this.closeButtonElement.addEventListener('click', () => {
+        this.hide(/*closed=*/true);
+      });
+    }
     this.element.addEventListener('mousedown', (event) => {
       this.setAsActive();
     });
