@@ -1,4 +1,5 @@
-const WINDOW_BORDERS = ['nw', 'n', 'ne', 'w', 'e', 'sw', 's', 'se'];
+const WINDOW_BORDERS_BEFORE = ['nw', 'n', 'ne', 'w'];
+const WINDOW_BORDERS_AFTER = ['e', 'sw', 's', 'se'];
 
 let windows = [];
 let desktopIcons = [];
@@ -14,15 +15,26 @@ class ViewBorder {
 
   setUp() {
     this.borderElements = [];
-    WINDOW_BORDERS.forEach((border) => {
-      // TODO: Dynamically add the border to the window element.
-      const element = this.parentElement.querySelector(`.view-window-border-${border}`);
+    const addBorderElement = (element, border) => {
       element.addEventListener('mousedown', (event) => {
         this.viewWindow.setAsActive();
         this.viewWindow.startResize(event.clientX, event.clientY, event.buttons, [...border]);
         document.getElementsByTagName('body')[0].style.cursor = `${border}-resize`;
       });
       this.borderElements.push(element);
+    };
+    const contentElement = this.parentElement.querySelector('.view-window-inner');
+    WINDOW_BORDERS_BEFORE.forEach((border) => {
+      const element = document.createElement('div');
+      element.className = `view-window-border-${border}`;
+      this.parentElement.insertBefore(element, contentElement);
+      addBorderElement(element, border);
+    });
+    WINDOW_BORDERS_AFTER.forEach((border) => {
+      const element = document.createElement('div');
+      element.className = `view-window-border-${border}`;
+      this.parentElement.appendChild(element);
+      addBorderElement(element, border);
     });
   }
 
