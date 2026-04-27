@@ -70,17 +70,10 @@ class ViewWindow {
 
   setUp(startOpened, titleButtons) {
     this.element = document.getElementById(this.id);
-    this.titleElement = this.element.querySelector('.view-window-title');
     this.contentElement = this.element.querySelector('.view-window-content');
 
-    const style = window.getComputedStyle(this.element);
-    this.iconUrl = style.getPropertyValue('--icon');
-    this.title = style.getPropertyValue('--title').trim().replaceAll("\"", "");
-    this.titleElement.querySelector('.view-window-title-text').innerHTML = this.title;
-    this.addTitleButtons(titleButtons);
-
+    this.createTitle(titleButtons);
     this.viewBorder = new ViewBorder(this, this.element);
-
     this.createEvents();
     if (startOpened) {
       this.show(/*opened=*/true);
@@ -89,24 +82,37 @@ class ViewWindow {
     }
   }
 
-  addTitleButtons(titleButtons) {
-    const buttonContainer = this.titleElement.querySelector('.view-window-title-buttons');
-    if (!buttonContainer) return;
+  createTitle(titleButtons) {
+    this.titleElement = document.createElement('div');
+    this.titleElement.className = 'view-window-title';
+    const textElement = document.createElement('div');
+    textElement.className = 'view-window-title-text';
+    const buttonsContainer = document.createElement('div');
+    buttonsContainer.className = 'view-window-title-buttons';
+    this.titleElement.appendChild(textElement);
+    this.titleElement.appendChild(buttonsContainer);
+    this.element.querySelector('.view-window-inner').prepend(this.titleElement);
+
     if (titleButtons & titleButton.MINIMIZE) {
       this.minimizeButtonElement = document.createElement('button');
       this.minimizeButtonElement.className = 'view-window-minimize';
-      buttonContainer.appendChild(this.minimizeButtonElement);
+      buttonsContainer.appendChild(this.minimizeButtonElement);
     }
     if (titleButtons & titleButton.MAXIMIZE) {
       this.maximizeButtonElement = document.createElement('button');
       this.maximizeButtonElement.className = 'view-window-maximize';
-      buttonContainer.appendChild(this.maximizeButtonElement);
+      buttonsContainer.appendChild(this.maximizeButtonElement);
     }
     if (titleButtons & titleButton.CLOSE) {
       this.closeButtonElement = document.createElement('button');
       this.closeButtonElement.className = 'view-window-close';
-      buttonContainer.appendChild(this.closeButtonElement);
+      buttonsContainer.appendChild(this.closeButtonElement);
     }
+
+    const style = window.getComputedStyle(this.element);
+    this.title = style.getPropertyValue('--title').trim().replaceAll("\"", "");
+    this.iconUrl = style.getPropertyValue('--icon');
+    this.titleElement.querySelector('.view-window-title-text').innerHTML = this.title;
   }
 
   addToTaskbar() {
