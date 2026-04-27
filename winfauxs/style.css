@@ -15,8 +15,8 @@ body {
   display: grid;
   grid-template-columns: auto minmax(0, 1fr) auto;
   grid-template-rows: auto minmax(0, 1fr) auto;
-  width: 500px;
-  height: 250px;
+  width: auto;
+  height: auto;
   min-width: 200px;
   min-height: 200px;
   background-color: #E0E0E0;
@@ -173,6 +173,61 @@ body {
   padding: 5px;
 }
 
+.view-window-alert {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  grid-template-rows: auto minmax(0, 1fr);
+}
+
+.view-window-alert-message {
+  display: grid;
+  align-items: center;
+  justify-content: center;
+  grid-template-columns: auto minmax(0, 1fr);
+}
+
+.view-window-alert-message-icon {
+  background-repeat: no-repeat;
+  background-position: center;
+  width: 64px;
+  height: 64px;
+  padding: 16px;
+}
+
+.view-window-alert-message-icon[state="info"] {
+  background-image: url("images/alert-info.png");
+}
+
+.view-window-alert-message-icon[state="warning"] {
+  background-image: url("images/alert-warning.png");
+}
+
+.view-window-alert-message-icon[state="error"] {
+  background-image: url("images/alert-error.png");
+}
+
+.view-window-alert-message-text {
+  padding: 16px;
+}
+
+.view-window-alert-buttons {
+  margin: 0 auto;
+  padding: 8px;
+}
+
+.view-window-alert-buttons > button {
+  border: none;
+  padding: 4px;
+  width: 100px;
+  box-shadow: 0 1px inset white, -1px 0 inset white, 1px 0 inset darkgray, 0 -1px inset darkgray;
+}
+
+.view-window-alert-buttons > button:active {
+  background-color: rgb(199, 199, 199);
+  box-shadow: 0 -1px inset gray, 1px 0 inset gray, -1px 0 inset darkgray, 0 1px inset darkgray;
+}
+
 .icon {
   display: grid;
   grid-template-rows: 50px auto;
@@ -289,12 +344,14 @@ body {
 #mainWindow {
   --xpos: 80;
   --ypos: 80;
+  width: 500px;
   --title: "Main Window";
 }
 
 #secondaryWindow {
   --xpos: 120;
   --ypos: 120;
+  width: 500px;
   --title: "Secondary Window With A Very, Very Long Title";
 }
 
