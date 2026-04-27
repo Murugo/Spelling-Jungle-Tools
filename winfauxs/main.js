@@ -408,6 +408,7 @@ function alert(title, message, alertType, buttons = [alertButtonEnum.OK]) {
   const windowElement = document.createElement('div');
   windowElement.className = 'view-window';
   windowElement.style.setProperty('--title', title);
+  windowElement.style.setProperty('--noIconMargin', '4px');
   windowElement.style.height = 'auto';
   windowElement.style.minHeight = 0;
 

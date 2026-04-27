@@ -25,7 +25,6 @@ body {
   --xpos: 0;
   --ypos: 0;
   --title: "Default";
-  --icon: url("images/icon-placeholder.png");
   transform: translate(
     calc(var(--xpos) * 1px),
     calc(var(--ypos) * 1px)
@@ -126,7 +125,7 @@ body {
   white-space: nowrap;
   font-size: 11pt;
   min-width: 0;
-  padding-left: 24px;
+  padding-left: var(--noIconMargin, 24px);
   align-self: center;
 }
 
@@ -346,6 +345,7 @@ body {
   --ypos: 80;
   width: 500px;
   --title: "Main Window";
+  --icon: url("images/icon-placeholder.png");
 }
 
 #secondaryWindow {
@@ -353,6 +353,7 @@ body {
   --ypos: 120;
   width: 500px;
   --title: "Secondary Window With A Very, Very Long Title";
+  --icon: url("images/icon-placeholder.png");
 }
 
 #mainWindowIcon {
