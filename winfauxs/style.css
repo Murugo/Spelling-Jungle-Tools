@@ -33,7 +33,7 @@ body {
 
 .view-window[state="maximized"] {
   width: calc(100% + 8px) !important;
-  height: calc(100% + 8px - 30px) !important;
+  height: calc(100% + 8px - 34px) !important;
   transform: translate(-4px, -4px);
 }
 
