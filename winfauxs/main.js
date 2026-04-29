@@ -23,6 +23,8 @@ let windows = [];
 let desktopIcons = [];
 let activeWindow;
 let activeIcon;
+let windowMaxZ = 1000;
+let iconMaxZ = 0;
 
 class ViewBorder {
   constructor(viewWindow, parentElement, resizable) {
@@ -87,6 +89,7 @@ class ViewWindow {
     this.anchorY = 0;
     this.deleteOnClose = deleteOnClose;
     this.maximized = false;
+    this.priority = windowMaxZ++;
     this.setUp(startOpened, titleButtons);
   }
 
@@ -285,16 +288,26 @@ class ViewWindow {
     if (activeWindow) {
       activeWindow.setNotActive();
     }
-    this.setPriority(21);
     activeWindow = this;
     this.titleElement.setAttribute('state', 'active');
     if (this.taskbarElement) {
       this.taskbarElement.setAttribute('state', 'active');
     }
+
+    const prevZ = this.priority;
+    windows.forEach((viewWindow) => {
+      if (viewWindow === this) {
+        viewWindow.setPriority(windowMaxZ);
+      } else {
+        const z = viewWindow.priority;
+        if (z > prevZ) {
+          viewWindow.setPriority(z - 1);
+        }
+      }
+    });
   }
 
   setNotActive() {
-    this.setPriority(20);
     if (activeWindow === this) {
       activeWindow = undefined;
     }
@@ -305,6 +318,7 @@ class ViewWindow {
   }
 
   setPriority(priority) {
+    this.priority = priority;
     this.element.style.zIndex = priority;
   }
 
@@ -321,7 +335,8 @@ class ViewWindow {
     }
     if (this.deleteOnClose) {
       windows.splice(windows.indexOf(this), 1);
-      document.body.removeChild(this.element);
+      document.querySelector('.view-windows').removeChild(this.element);
+      windowMaxZ--;
     }
   }
 
@@ -345,6 +360,7 @@ class Icon {
     this.dragging = false;
     this.dragStartX = 0;
     this.dragStartY = 0;
+    this.priority = iconMaxZ++;
     this.setUp();
   }
 
@@ -390,16 +406,27 @@ class Icon {
       activeIcon.deselect();
     }
     activeIcon = this;
-    this.setPriority(11);
+    
+    const prevZ = this.priority;
+    desktopIcons.forEach((icon) => {
+      if (icon === this) {
+        icon.setPriority(iconMaxZ);
+      } else {
+        const z = icon.priority;
+        if (z > prevZ) {
+          icon.setPriority(z - 1);
+        }
+      }
+    });
   }
 
   deselect() {
     this.element.removeAttribute('state');
-    this.setPriority(10);
     activeIcon = undefined;
   }
 
   setPriority(priority) {
+    this.priority = priority;
     this.element.style.zIndex = priority
   }
 }
@@ -448,7 +475,7 @@ function alert(title, message, alertType, buttons = [alertButtonEnum.OK]) {
   textElement.innerHTML = message;
   messageElement.appendChild(textElement);
 
-  document.body.prepend(windowElement);
+  document.querySelector('.view-windows').append(windowElement);
   
   const viewWindow = new ViewWindow(
     windowElement,
