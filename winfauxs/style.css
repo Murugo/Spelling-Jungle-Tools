@@ -219,12 +219,13 @@ body {
   border: none;
   padding: 4px;
   width: 100px;
+  background-color: transparent;
   box-shadow: 0 1px inset white, -1px 0 inset white, 1px 0 inset darkgray, 0 -1px inset darkgray;
 }
 
 .view-window-alert-buttons > button:active {
   background-color: rgb(199, 199, 199);
-  box-shadow: 0 -1px inset gray, 1px 0 inset gray, -1px 0 inset darkgray, 0 1px inset darkgray;
+  box-shadow: 0 -1px inset white, 1px 0 inset white, -1px 0 inset darkgray, 0 1px inset darkgray;
 }
 
 .icon {
@@ -279,7 +280,7 @@ body {
   gap: 4px;
   bottom: 0;
   left: 0;
-  z-index: 200;
+  z-index: 999;
 }
 
 .taskbar-start-button {
@@ -292,7 +293,7 @@ body {
   color: black;
   font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
   text-align: right;
-  background-color: darkgray;
+  background-color: transparent;
   border: none;
   font-weight: bold;
 }
@@ -338,6 +339,63 @@ body {
 .taskbar-view-window[state="active"] {
   box-shadow: 0 -1px inset white, 1px 0 inset white, -1px 0 inset gray, 0 1px inset gray;
   background-color: lightgray;
+}
+
+.start-menu {
+  display: flex;
+  flex-direction: row;
+  background-color: lightgray;
+  position: fixed;
+  bottom: 30px;
+  left: 0;
+  z-index: 998;
+  --height: 0px;
+  box-shadow: 0 1px inset white, -1px 0 inset white, 1px 0 inset gray, 0 -1px inset gray;
+  visibility: hidden;
+}
+
+.start-menu-opened {
+  animation: 0.1s 1 forwards open-start-menu;
+  animation-timing-function: linear;
+  visibility: visible;
+}
+
+.start-menu-stripe {
+  width: 16px;
+  background: linear-gradient(0, navy, lightblue);
+}
+
+.start-menu-buttons {
+  display: flex;
+  flex-direction: column;
+}
+
+.start-menu-buttons > button {
+  font-size: 12pt;
+  font-weight: bold;
+  text-align: left;
+  padding: 16px;
+  width: 100%;
+  border: none;
+  background-color: transparent;
+}
+
+.start-menu-buttons > button:enabled:hover {
+  box-shadow: 0 1px inset white, -1px 0 inset white, 1px 0 inset darkgray, 0 -1px inset darkgray;
+}
+
+.start-menu-buttons > button:enabled:active {
+  background-color: rgb(199, 199, 199);
+  box-shadow: 0 -1px inset white, 1px 0 inset white, -1px 0 inset darkgray, 0 1px inset darkgray;
+}
+
+@keyframes open-start-menu {
+  from {
+    bottom: calc(30px - var(--height));
+  }
+  to {
+    bottom: 30px;
+  }
 }
 
 #mainWindow {

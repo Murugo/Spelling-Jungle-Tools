@@ -514,17 +514,15 @@ function onLoad() {
   desktopIcons.push(new Icon('mainWindowIcon', windows[0]));
   desktopIcons.push(new Icon('secondaryWindowIcon', windows[1]));
 
-  alert('Welcome', '<3', alertTypeEnum.INFO);
+  // alert('Welcome', '<3', alertTypeEnum.INFO);
 
   document.addEventListener('mousedown', (event) => {
-    if (event.buttons !== 1) return;
-    if (!activeIcon) return;
-    for (const name of event.target.classList) {
-      if (name.startsWith('icon')) {
-        return;
-      }
+    if (activeIcon && !event.target.closest('.icon')) {
+      activeIcon.deselect();
     }
-    activeIcon.deselect();
+    if (!event.target.closest('.start-menu') && !event.target.classList.contains('taskbar-start-button')) {
+      document.querySelector('.start-menu').classList.remove('start-menu-opened');
+    }
   });
   document.addEventListener('mousemove', (event) => {
     if (activeWindow) {
@@ -536,6 +534,23 @@ function onLoad() {
   });
   window.addEventListener("resize", () => {
     windows.forEach((w) => w.fitInWindow());
+  });
+  
+  // Initialize start menu animation
+  const startMenuElement = document.querySelector('.start-menu');
+  const startMenuRect = startMenuElement.getBoundingClientRect();
+  startMenuElement.style.setProperty('--height', `${startMenuRect.height}px`);
+  document.querySelector('.taskbar-start-button').addEventListener('click', () => {
+    if (startMenuElement.classList.contains('start-menu-opened')) {
+      startMenuElement.classList.remove('start-menu-opened');
+    } else {
+      startMenuElement.classList.add('start-menu-opened');
+    }
+  });
+
+  document.querySelector('#openDll').addEventListener('click', () => {
+    startMenuElement.classList.remove('start-menu-opened');
+    alert('Open DLL', 'Not implemented!', alertTypeEnum.ERROR);
   });
 }
 
