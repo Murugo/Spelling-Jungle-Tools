@@ -75,6 +75,7 @@ class ViewWindow {
               startOpened = true,
               resizable = true,
               deleteOnClose = false,
+              showOnTaskbar = true,
               titleButtons = titleButtonEnum.MINIMIZE | titleButtonEnum.MAXIMIZE | titleButtonEnum.CLOSE) {
     this.element = element;
     this.dragging = false;
@@ -88,6 +89,7 @@ class ViewWindow {
     this.anchorX = 0;
     this.anchorY = 0;
     this.deleteOnClose = deleteOnClose;
+    this.showOnTaskbar = showOnTaskbar;
     this.maximized = false;
     this.priority = windowMaxZ++;
     this.setUp(startOpened, titleButtons);
@@ -346,10 +348,10 @@ class ViewWindow {
   }
 
   open() {
-    this.show();
-    if (!this.taskbarElement) {
+    if (!this.taskbarElement && this.showOnTaskbar) {
       this.addToTaskbar();
     }
+    this.show();
   }
 }
 
@@ -482,6 +484,7 @@ function alert(title, message, alertType, buttons = [alertButtonEnum.OK]) {
     /*startOpened=*/true,
     /*resizable=*/false,
     /*deleteOnClose=*/true,
+    /*showOnTaskbar=*/false,
     titleButtonEnum.NONE);
   windows.push(viewWindow);
 
