@@ -403,6 +403,14 @@ class Icon {
     this.element.style.setProperty('--ypos', y);
   }
 
+  fitInWindow() {
+    const style = window.getComputedStyle(this.element);
+    const x = Math.max(Math.min(style.getPropertyValue('--xpos'), window.innerWidth - 40), 0);
+    const y = Math.max(Math.min(style.getPropertyValue('--ypos'), window.innerHeight - 40), 0);
+    this.element.style.setProperty('--xpos', x);
+    this.element.style.setProperty('--ypos', y);
+  }
+
   select() {
     this.element.setAttribute('state', 'selected');
     if (activeIcon && activeIcon !== this) {
@@ -540,6 +548,7 @@ function onLoad() {
   });
   window.addEventListener("resize", () => {
     windows.forEach((w) => w.fitInWindow());
+    desktopIcons.forEach((icon) => icon.fitInWindow());
   });
   
   // Initialize start menu animation
