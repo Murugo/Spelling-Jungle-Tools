@@ -25,6 +25,7 @@ let activeWindow;
 let activeIcon;
 let windowMaxZ = 1000;
 let iconMaxZ = 0;
+let alertWindowCount = 0;
 
 class ViewBorder {
   constructor(viewWindow, parentElement, resizable) {
@@ -91,7 +92,7 @@ class ViewWindow {
     this.deleteOnClose = deleteOnClose;
     this.showOnTaskbar = showOnTaskbar;
     this.maximized = false;
-    this.priority = windowMaxZ++;
+    this.setPriority(windowMaxZ++);
     this.setUp(startOpened, titleButtons);
   }
 
@@ -499,15 +500,17 @@ function alert(title, message, alertType, buttons = [alertButtonEnum.OK]) {
         buttonElement.innerHTML = "OK";
         buttonElement.addEventListener('click', () => {
           viewWindow.close();
+          alertWindowCount--;
         })
         break;
     };
     buttonsElement.append(buttonElement);
   });
 
+  alertWindowCount++;
   const rect = windowElement.getBoundingClientRect();
-  windowElement.style.setProperty('--xpos', (window.innerWidth - rect.width) / 2);
-  windowElement.style.setProperty('--ypos', (window.innerHeight - rect.height) / 2);
+  windowElement.style.setProperty('--xpos', ((window.innerWidth - rect.width) / 2 + alertWindowCount * 20) % (window.innerWidth - 200));
+  windowElement.style.setProperty('--ypos', ((window.innerHeight - rect.height) / 2 + alertWindowCount * 20) % (window.innerHeight - 200));
 }
 
 function onLoad() {
