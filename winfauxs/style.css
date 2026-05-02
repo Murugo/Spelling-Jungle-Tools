@@ -280,7 +280,7 @@ body {
   gap: 4px;
   bottom: 0;
   left: 0;
-  z-index: 999;
+  z-index: 5000;
 }
 
 .taskbar-start-button {
@@ -348,7 +348,7 @@ body {
   position: fixed;
   bottom: 30px;
   left: 0;
-  z-index: 998;
+  z-index: 4999;
   --height: 0px;
   box-shadow: 0 1px inset white, -1px 0 inset white, 1px 0 inset gray, 0 -1px inset gray;
   visibility: hidden;
@@ -385,7 +385,12 @@ body {
 }
 
 .start-menu-buttons > button:enabled:active {
-  background-color: rgb(199, 199, 199);
+  background-color: rgb(200, 200, 200);
+  box-shadow: 0 -1px inset white, 1px 0 inset white, -1px 0 inset darkgray, 0 1px inset darkgray;
+}
+
+.start-menu-buttons > button:enabled[state="active"] {
+  background-color: rgb(200, 200, 200);
   box-shadow: 0 -1px inset white, 1px 0 inset white, -1px 0 inset darkgray, 0 1px inset darkgray;
 }
 

@@ -521,19 +521,16 @@ function alert(title, message, alertType, buttons = [alertButtonEnum.OK]) {
   windowElement.style.setProperty('--ypos', ((window.innerHeight - rect.height) / 2 + alertWindowCount * 20) % (window.innerHeight - 200));
 }
 
-function onLoad() {
-  windows.push(new ViewWindow(document.querySelector('#mainWindow'), /*startOpened=*/false));
-  windows.push(new ViewWindow(document.querySelector('#secondaryWindow'), /*startOpened=*/false));
-
-  desktopIcons.push(new Icon('mainWindowIcon', windows[0]));
-  desktopIcons.push(new Icon('secondaryWindowIcon', windows[1]));
-
-  // alert('Welcome', '<3', alertTypeEnum.INFO);
-
+function initWindowEvents() {
   document.addEventListener('mousedown', (event) => {
     if (activeIcon && !event.target.closest('.icon')) {
       activeIcon.deselect();
     }
+    if (!event.target.closest('.start-menu') && !event.target.classList.contains('taskbar-start-button')) {
+      document.querySelector('.start-menu').classList.remove('start-menu-opened');
+    }
+  });
+  document.addEventListener('mouseup', (event) => {
     if (!event.target.closest('.start-menu') && !event.target.classList.contains('taskbar-start-button')) {
       document.querySelector('.start-menu').classList.remove('start-menu-opened');
     }
@@ -550,12 +547,14 @@ function onLoad() {
     windows.forEach((w) => w.fitInWindow());
     desktopIcons.forEach((icon) => icon.fitInWindow());
   });
-  
-  // Initialize start menu animation
+}
+
+function initStartMenu() {
+  // Open animation
   const startMenuElement = document.querySelector('.start-menu');
   const startMenuRect = startMenuElement.getBoundingClientRect();
   startMenuElement.style.setProperty('--height', `${startMenuRect.height}px`);
-  document.querySelector('.taskbar-start-button').addEventListener('click', () => {
+  document.querySelector('.taskbar-start-button').addEventListener('mousedown', () => {
     if (startMenuElement.classList.contains('start-menu-opened')) {
       startMenuElement.classList.remove('start-menu-opened');
     } else {
@@ -563,10 +562,41 @@ function onLoad() {
     }
   });
 
+  // Buttons
+  document.querySelector('.start-menu-buttons').childNodes.forEach((buttonElement) => {
+    buttonElement.addEventListener('mouseenter', function(event) {
+      if (event.buttons !== 1) return;
+      buttonElement.setAttribute('state', 'active');
+    });
+    buttonElement.addEventListener('mouseleave', function(event) {
+      buttonElement.removeAttribute('state');
+    });
+    buttonElement.addEventListener('mouseup', function(event) {
+      if (buttonElement.getAttribute('state') !== 'active') return;
+      buttonElement.click();
+    });
+  });
   document.querySelector('#openDll').addEventListener('click', () => {
     startMenuElement.classList.remove('start-menu-opened');
     alert('Open DLL', 'Not implemented!', alertTypeEnum.ERROR);
   });
+  document.querySelector('#saveDll').addEventListener('click', () => {
+    startMenuElement.classList.remove('start-menu-opened');
+    alert('Export DLL', 'Oops!', alertTypeEnum.ERROR);
+  });
+}
+
+function onLoad() {
+  windows.push(new ViewWindow(document.querySelector('#mainWindow'), /*startOpened=*/false));
+  windows.push(new ViewWindow(document.querySelector('#secondaryWindow'), /*startOpened=*/false));
+
+  desktopIcons.push(new Icon('mainWindowIcon', windows[0]));
+  desktopIcons.push(new Icon('secondaryWindowIcon', windows[1]));
+
+  initWindowEvents();
+  initStartMenu();
+
+  // alert('Welcome', '<3', alertTypeEnum.INFO);
 }
 
 window.onload = function() {
