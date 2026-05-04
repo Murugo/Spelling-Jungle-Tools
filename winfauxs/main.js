@@ -69,6 +69,18 @@ class ViewBorder {
       element.style.visibility = visible ? 'visible' : 'hidden';
     });
   }
+
+  startResize() {
+    this.borderElements.forEach((element) => {
+      element.style.cursor = 'inherit';
+    });
+  }
+
+  endResize() {
+    this.borderElements.forEach((element) => {
+      element.style.removeProperty('cursor');
+    });
+  }
 }
 
 class ViewWindow {
@@ -89,6 +101,8 @@ class ViewWindow {
     this.resizingBottom = false;
     this.anchorX = 0;
     this.anchorY = 0;
+    this.clickOffsetX = 0;
+    this.clickOffsetY = 0;
     this.deleteOnClose = deleteOnClose;
     this.showOnTaskbar = showOnTaskbar;
     this.maximized = false;
@@ -218,23 +232,28 @@ class ViewWindow {
     types.forEach((type) => {
       switch (type) {
         case 'e':
-          this.anchorX = clientX - parseInt(style.width, 10);
+          this.anchorX = style.getPropertyValue('--xpos');
+          this.clickOffsetX = clientX - this.anchorX - parseInt(style.width, 10);
           this.resizingRight = true;
           break;
         case 'w':
-          this.anchorX = clientX + parseInt(style.width, 10);
+          this.anchorX = parseInt(style.getPropertyValue('--xpos'), 10) + parseInt(style.width, 10);
+          this.clickOffsetX = clientX - style.getPropertyValue('--xpos');
           this.resizingLeft = true;
           break;
         case 'n':
-          this.anchorY = clientY + parseInt(style.height, 10);
+          this.anchorY = parseInt(style.getPropertyValue('--ypos')) + parseInt(style.height, 10);
+          this.clickOffsetY = clientY - style.getPropertyValue('--ypos');
           this.resizingTop = true;
           break;
         case 's':
-          this.anchorY = clientY - parseInt(style.height, 10);      
+          this.anchorY = style.getPropertyValue('--ypos');
+          this.clickOffsetY = clientY - this.anchorY - parseInt(style.height, 10);
           this.resizingBottom = true;
           break;
       }
     });
+    this.viewBorder.startResize();
   }
 
   handleResize(clientX, clientY, buttons, type) {
@@ -243,6 +262,7 @@ class ViewWindow {
       this.resizingRight = false;
       this.resizingTop = false;
       this.resizingBottom = false;
+      this.viewBorder.endResize();
       document.getElementsByTagName('body')[0].style.removeProperty('cursor');
       return;
     }
@@ -250,22 +270,24 @@ class ViewWindow {
     const minWidth = parseInt(style.minWidth, 10);
     const minHeight = parseInt(style.minHeight, 10);
     if (this.resizingLeft) {
-      const newX = Math.min(Math.max(0, Math.min(clientX, window.innerWidth - 100)), this.anchorX - minWidth);
-      this.element.style.width = this.anchorX - newX;
-      this.element.style.setProperty('--xpos', newX);
+      const newX = Math.max(Math.min(clientX - this.clickOffsetX, window.innerWidth - 100), 0);
+      const newWidth = this.anchorX - newX;
+      if (newWidth >= minWidth) {
+        this.element.style.width = newWidth;
+        this.element.style.setProperty('--xpos', newX);
+      }
     } else if (this.resizingRight) {
-      const x = parseInt(style.getPropertyValue('--xpos'), 10);
-      const newWidth = Math.max(clientX - this.anchorX, 100 - x);
-      this.element.style.width = Math.min(Math.max(newWidth, minWidth), window.innerWidth - x);
+      this.element.style.width = Math.min(Math.max(clientX - this.clickOffsetX, 100), window.innerWidth) - this.anchorX;
     }
     if (this.resizingTop) {
-      const newY = Math.min(Math.max(0, Math.min(clientY, window.innerHeight - 100)), this.anchorY - minHeight);
-      this.element.style.height = this.anchorY - newY;
-      this.element.style.setProperty('--ypos', newY);
+      const newY = Math.max(Math.min(clientY - this.clickOffsetY, window.innerHeight - 100), 0);
+      const newHeight = this.anchorY - newY;
+      if (newHeight >= minHeight) {
+        this.element.style.height = newHeight;
+        this.element.style.setProperty('--ypos', newY);
+      }
     } else if (this.resizingBottom) {
-      const y = parseInt(style.getPropertyValue('--ypos'), 10);
-      const newHeight = clientY - this.anchorY;
-      this.element.style.height = Math.min(Math.max(newHeight, minHeight), window.innerHeight - y);
+      this.element.style.height = Math.min(clientY - this.clickOffsetY, window.innerHeight - 30) - this.anchorY;
     }
   }
 
